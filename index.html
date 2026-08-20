@@ -1,0 +1,1902 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>李子翎 · 产品经理</title>
+  <style>
+    /* ── 全局 Reset ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #f5f2ee;
+      --ink: #1a1a1a;
+      --accent: #d4522a;
+      --muted: #888;
+      --card-bg: #ffffffcc;
+      --serif: 'Georgia', 'STSong', serif;
+      --sans: 'Helvetica Neue', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: var(--sans);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── 自定义光标 ── */
+    body { cursor: none; }
+    #cursor {
+      position: fixed;
+      width: 14px; height: 14px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      mix-blend-mode: difference;
+      background: #ffffff;
+      transition: width .15s, height .15s;
+    }
+    #cursor.hovered {
+      width: 20px; height: 20px;
+    }
+    #cursor-follower { display: none; }
+
+    /* ── 浮动标签（鼠标跟随） ── */
+    #tooltip {
+      position: fixed;
+      pointer-events: none;
+      z-index: 9997;
+      font-family: var(--serif);
+      font-size: 13px;
+      letter-spacing: .08em;
+      color: var(--bg);
+      background: var(--ink);
+      padding: 6px 14px;
+      border-radius: 2px;
+      opacity: 0;
+      transform: translate(16px, -50%) scale(.9);
+      transition: opacity .2s, transform .2s;
+      white-space: nowrap;
+    }
+    #tooltip.show {
+      opacity: 1;
+      transform: translate(16px, -50%) scale(1);
+    }
+
+    /* ── 导航 ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 48px;
+      background: rgba(245, 242, 238, 0.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(0,0,0,.06);
+      transition: background .3s;
+    }
+    .nav-logo {
+      font-family: var(--serif);
+      font-size: 18px;
+      letter-spacing: .04em;
+      color: var(--ink);
+      text-decoration: none;
+    }
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-size: 13px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--ink);
+      text-decoration: none;
+      opacity: .6;
+      transition: opacity .2s;
+    }
+    .nav-links a:hover { opacity: 1; }
+
+    /* ── Hero ── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 0 48px 80px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-eyebrow {
+      font-size: 12px;
+      letter-spacing: .18em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+    .hero-name {
+      font-family: var(--serif);
+      font-size: clamp(56px, 12vw, 140px);
+      line-height: .92;
+      letter-spacing: -.02em;
+      color: var(--ink);
+    }
+    .hero-name em {
+      font-style: italic;
+      color: var(--accent);
+    }
+    .hero-sub {
+      margin-top: 32px;
+      font-size: 15px;
+      color: var(--muted);
+      letter-spacing: .06em;
+      max-width: 480px;
+      line-height: 1.7;
+    }
+    .hero-scroll {
+      margin-top: 60px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 11px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 28px;
+    }
+    .scroll-line {
+      width: 40px; height: 1px;
+      background: var(--muted);
+      animation: scrollLine 1.6s ease-in-out infinite alternate;
+    }
+    @keyframes scrollLine { from { width: 20px } to { width: 60px } }
+
+    /* ── 大字背景 ── */
+    .hero-bg-text {
+      position: absolute;
+      top: 50%; right: -40px;
+      transform: translateY(-50%);
+      font-family: var(--serif);
+      font-size: clamp(120px, 22vw, 280px);
+      color: var(--ink);
+      opacity: 0.04;
+      letter-spacing: -.05em;
+      pointer-events: none;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    /* ── Section 通用 ── */
+    section {
+      padding: 120px 48px;
+    }
+    .section-label {
+      font-size: 11px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 48px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .section-label::after {
+      content: '';
+      display: block;
+      flex: 1;
+      height: 1px;
+      background: var(--accent);
+      opacity: .3;
+    }
+
+    /* ── 模块网格（主页） ── */
+    #modules {
+      padding: 80px 48px 120px;
+      background: var(--ink);
+    }
+    .modules-title {
+      font-family: var(--serif);
+      font-size: clamp(32px, 5vw, 56px);
+      color: var(--bg);
+      margin-bottom: 64px;
+      letter-spacing: -.01em;
+    }
+    .modules-title em { color: var(--accent); font-style: italic; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+    }
+    .module-card {
+      position: relative;
+      aspect-ratio: 1;
+      background: #222;
+      overflow: hidden;
+      cursor: none;
+      transition: background .3s;
+    }
+    .module-card:hover { background: var(--accent); }
+
+    .module-card .card-icon {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform .4s cubic-bezier(.25,.46,.45,.94), opacity .3s;
+    }
+    .module-card .card-icon img {
+      width: 72%;
+      height: 72%;
+      object-fit: contain;
+      opacity: .88;
+      transition: transform .4s cubic-bezier(.25,.46,.45,.94), opacity .3s;
+      filter: drop-shadow(0 4px 12px rgba(0,0,0,.25));
+    }
+    .module-card:hover .card-icon img {
+      transform: scale(1.12);
+      opacity: 1;
+    }
+
+    .module-card .card-num {
+      position: absolute;
+      top: 16px; left: 20px;
+      font-size: 11px;
+      letter-spacing: .12em;
+      color: rgba(255,255,255,.3);
+      font-family: var(--serif);
+    }
+
+    .tag {
+      padding: 6px 14px;
+      border: 1px solid var(--ink);
+      font-size: 12px;
+      letter-spacing: .08em;
+      border-radius: 100px;
+      color: var(--ink);
+      transition: background .2s, color .2s;
+    }
+    .tag:hover { background: var(--ink); color: var(--bg); }
+
+    /* ── 时间轴项目经历 ── */
+    .exp-overlay-inner { max-width: 100%; padding: 80px 64px 120px; }
+
+    .timeline-wrap {
+      display: grid;
+      grid-template-columns: 140px 1fr;
+      gap: 0 48px;
+      position: relative;
+    }
+
+    /* 左侧轨道 + 时间标注 */
+    .tl-track {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+    /* 竖线居中于圆点位置 */
+    .tl-track::before {
+      content: '';
+      position: absolute;
+      top: 16px; bottom: 16px;
+      width: 2px;
+      background: rgba(0,0,0,.1);
+      right: 20px;
+    }
+    .tl-fill {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      transform: translateX(50%);
+      width: 2px;
+      background: var(--accent);
+      height: 0%;
+      transition: height .12s linear;
+      z-index: 1;
+    }
+
+    /* 每个时间节点行 */
+    .tl-node {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-end;
+      gap: 12px;
+      position: relative;
+      width: 100%;
+    }
+    .tl-time-label {
+      text-align: right;
+      font-size: 11px;
+      letter-spacing: .08em;
+      color: var(--muted);
+      line-height: 1.4;
+      padding-top: 4px;
+      white-space: nowrap;
+    }
+    .tl-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: rgba(0,0,0,.15);
+      flex-shrink: 0;
+      margin-top: 6px;
+      z-index: 2;
+      transition: background .3s, transform .3s;
+    }
+    .tl-dot.active {
+      background: var(--accent);
+      transform: scale(1.5);
+    }
+
+    /* 卡片列 */
+    .tl-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* 单张卡片 —— 与页面同色系 */
+    .tl-card {
+      background: #fff;
+      border: 1px solid rgba(0,0,0,.08);
+      border-radius: 12px;
+      padding: 28px 32px;
+      cursor: none;
+      overflow: hidden;
+      transition: box-shadow .3s, transform .3s, border-color .3s;
+      outline: none;
+    }
+    .tl-card:hover, .tl-card:focus {
+      box-shadow: 0 12px 40px rgba(0,0,0,.1);
+      transform: translateY(-2px);
+      border-color: var(--accent);
+    }
+
+    .tl-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .tl-company {
+      font-size: 12px;
+      letter-spacing: .1em;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .tl-company.baidu  { color: #2563eb; }
+    .tl-company.meituan { color: #d97706; }
+    .tl-company.jd     { color: var(--accent); }
+    .tl-period {
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: .06em;
+    }
+
+    .tl-card-name {
+      font-family: var(--serif);
+      font-size: clamp(18px, 2.2vw, 24px);
+      line-height: 1.25;
+      color: var(--ink);
+      margin-bottom: 16px;
+    }
+
+    .tl-metrics {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 28px;
+      margin-bottom: 14px;
+    }
+    .tl-metric-big {
+      font-size: 12px;
+      color: var(--muted);
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
+    }
+    .tl-metric-big em {
+      font-style: normal;
+      font-family: var(--serif);
+      font-size: clamp(20px, 2.6vw, 30px);
+      letter-spacing: -.01em;
+      color: var(--ink);
+    }
+    .tl-card:has(.baidu)   .tl-metric-big em { color: #2563eb; }
+    .tl-card:has(.meituan) .tl-metric-big em { color: #d97706; }
+    .tl-card:has(.jd)      .tl-metric-big em { color: var(--accent); }
+    .tl-metric-big small {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .tl-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .tl-tag {
+      padding: 4px 10px;
+      border: 1px solid rgba(0,0,0,.12);
+      border-radius: 100px;
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: .04em;
+      transition: border-color .2s, color .2s;
+    }
+    .tl-card:hover .tl-tag, .tl-card:focus .tl-tag {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* 展开详情 */
+    .tl-card-detail {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .45s cubic-bezier(.25,.46,.45,.94), opacity .3s;
+      opacity: 0;
+    }
+    .tl-card:hover .tl-card-detail,
+    .tl-card:focus .tl-card-detail {
+      max-height: 400px;
+      opacity: 1;
+    }
+    .tl-card-detail ul {
+      padding: 16px 0 0 0;
+      border-top: 1px solid rgba(0,0,0,.07);
+      margin-top: 16px;
+      list-style: none;
+    }
+    .tl-card-detail ul li {
+      font-size: 14px;
+      color: #555;
+      line-height: 1.75;
+      padding-left: 16px;
+      position: relative;
+      margin-bottom: 8px;
+    }
+    .tl-card-detail ul li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-size: 11px;
+    }
+
+    @media (max-width: 900px) {
+      .exp-overlay-inner { padding: 60px 20px 80px; }
+      .timeline-wrap { grid-template-columns: 72px 1fr; gap: 0 20px; }
+      .tl-time-label { font-size: 10px; }
+    }
+
+    /* ── 教育经历卡片 ── */
+    .edu-overlay-inner { max-width: 960px; }
+    .edu-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 8px;
+    }
+    .edu-card {
+      background: #fff;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,.07);
+      transition: box-shadow .3s, transform .3s;
+    }
+    .edu-card:hover {
+      box-shadow: 0 12px 40px rgba(0,0,0,.1);
+      transform: translateY(-3px);
+    }
+    .edu-card-img {
+      width: 100%;
+      aspect-ratio: 16/9;
+      object-fit: cover;
+      display: block;
+    }
+    .edu-card-body {
+      padding: 24px 28px 28px;
+    }
+    .edu-card-period {
+      font-size: 13px;
+      color: var(--accent);
+      font-weight: 600;
+      letter-spacing: .04em;
+      margin-bottom: 6px;
+    }
+    .edu-card-meta {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 4px;
+      letter-spacing: .02em;
+    }
+    .edu-card-school {
+      font-family: var(--serif);
+      font-size: clamp(22px, 2.8vw, 32px);
+      color: #000;
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .edu-card-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .edu-badge {
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 12px;
+      letter-spacing: .04em;
+      cursor: default;
+    }
+    /* ---- Life cards ---- */
+    .life-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto auto;
+      gap: 20px;
+      padding: 8px 0 40px;
+    }
+    .life-card {
+      background: var(--bg);
+      border: 1px solid rgba(26,26,26,.09);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,.06);
+      transition: transform .3s ease, box-shadow .3s ease;
+    }
+    .life-card:hover {
+      transform: translateY(-4px) rotate(0deg) !important;
+      box-shadow: 0 12px 36px rgba(0,0,0,.12);
+    }
+    .lc-1 { transform: rotate(-1.5deg); grid-column: 1; grid-row: 1; }
+    .lc-2 { transform: rotate(1.2deg);  grid-column: 2; grid-row: 1; margin-top: 24px; }
+    .lc-3 { transform: rotate(1deg);    grid-column: 1; grid-row: 2; margin-top: -16px; }
+    .lc-4 { transform: rotate(-1deg);   grid-column: 2; grid-row: 2; margin-top: 8px; }
+    .life-card-img {
+      width: 100%;
+      aspect-ratio: 4/3;
+      overflow: hidden;
+    }
+    .life-card-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform .5s ease;
+    }
+    .life-card:hover .life-card-img img {
+      transform: scale(1.04);
+    }
+    .life-card-body {
+      padding: 16px 18px 18px;
+    }
+    .life-tag {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .06em;
+      padding: 3px 10px;
+      border-radius: 100px;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+    .life-card-body p {
+      font-size: 13px;
+      line-height: 1.6;
+      color: rgba(26,26,26,.72);
+      margin: 0;
+    }
+    /* scroll reveal */
+    .life-reveal {
+      opacity: 0;
+      transform-origin: center center;
+    }
+    .life-reveal.lc-1 { transform: rotate(-1.5deg) translateY(40px); }
+    .life-reveal.lc-2 { transform: rotate(1.2deg)  translateY(40px); }
+    .life-reveal.lc-3 { transform: rotate(1deg)    translateY(40px); }
+    .life-reveal.lc-4 { transform: rotate(-1deg)   translateY(40px); }
+    .life-reveal.is-visible.lc-1 { opacity:1; transform: rotate(-1.5deg) translateY(0); transition: opacity .55s ease, transform .55s ease; }
+    .life-reveal.is-visible.lc-2 { opacity:1; transform: rotate(1.2deg)  translateY(0); transition: opacity .55s .1s ease, transform .55s .1s ease; }
+    .life-reveal.is-visible.lc-3 { opacity:1; transform: rotate(1deg)    translateY(0); transition: opacity .55s .2s ease, transform .55s .2s ease; }
+    .life-reveal.is-visible.lc-4 { opacity:1; transform: rotate(-1deg)   translateY(0); transition: opacity .55s .3s ease, transform .55s .3s ease; }
+    .life-card.is-visible:hover { transform: translateY(-4px) rotate(0deg) !important; }
+    /* ---- Contact ---- */
+    .contact-title { margin-bottom: 4px; }
+    .contact-intro {
+      font-family: var(--sans);
+      font-size: 13px;
+      letter-spacing: .08em;
+      color: rgba(26,26,26,.55);
+      text-transform: uppercase;
+      margin: 0 0 10px;
+    }
+    .contact-group {
+      border: 1px solid rgba(26,26,26,.1);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .contact-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      border-bottom: 1px solid rgba(26,26,26,.07);
+      text-decoration: none;
+      color: var(--ink);
+      background: transparent;
+      transition: background .18s;
+      cursor: default;
+    }
+    .contact-row:last-child { border-bottom: none; }
+    a.contact-row { cursor: pointer; }
+    a.contact-row:hover { background: rgba(212,82,42,.05); }
+    .contact-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: rgba(26,26,26,.07);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+    .contact-icon-li {
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0;
+      color: var(--ink);
+    }
+    .contact-label {
+      font-family: var(--sans);
+      font-size: 14px;
+      font-weight: 500;
+      width: 60px;
+      flex-shrink: 0;
+    }
+    .contact-value {
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      color: var(--accent);
+      flex: 1;
+      text-decoration: underline;
+      text-decoration-color: rgba(212,82,42,.35);
+      text-underline-offset: 3px;
+    }
+    .no-link .contact-value { text-decoration: none; color: var(--ink); }
+    .contact-arrow {
+      font-size: 14px;
+      color: rgba(26,26,26,.4);
+      flex-shrink: 0;
+    }
+    .contact-story-line {
+      font-family: var(--serif);
+      font-size: clamp(20px, 2.4vw, 28px);
+      color: var(--ink);
+      font-style: italic;
+      margin: 0 0 40px;
+      line-height: 1.4;
+    }
+    .contact-closing {
+      margin-top: 36px;
+      font-family: var(--serif);
+      font-size: clamp(16px, 1.6vw, 20px);
+      color: rgba(26,26,26,.55);
+      font-style: italic;
+    }
+    .edu-badge-highlight {
+      background: var(--accent);
+      color: #fff;
+    }
+    .edu-badge-normal {
+      border: 1px solid rgba(0,0,0,.14);
+      color: #555;
+    }
+    @media (max-width: 700px) {
+      .edu-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ---- Strengths cards ---- */
+    .strengths-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+      padding-bottom: 40px;
+    }
+    .str-card {
+      position: relative;
+      border: 1.5px solid rgba(26,26,26,.1);
+      border-radius: 16px;
+      overflow: hidden;
+      cursor: pointer;
+      min-height: 160px;
+      background: var(--bg);
+      box-shadow: 0 3px 14px rgba(0,0,0,.05);
+      transition: box-shadow .25s, border-color .25s;
+    }
+    .str-card:hover, .str-card:focus {
+      box-shadow: 0 8px 32px rgba(0,0,0,.12);
+      border-color: var(--accent);
+      outline: none;
+    }
+    .str-front {
+      padding: 24px 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: opacity .25s, transform .25s;
+    }
+    .str-card:hover .str-front,
+    .str-card:focus .str-front {
+      opacity: 0;
+      transform: translateY(-8px);
+      pointer-events: none;
+    }
+    .str-num {
+      font-family: var(--sans);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .16em;
+      color: var(--accent);
+    }
+    .str-title {
+      font-family: var(--serif);
+      font-size: clamp(20px, 2.2vw, 26px);
+      font-weight: 700;
+      color: var(--ink);
+      line-height: 1.2;
+    }
+    .str-tagline {
+      font-family: var(--sans);
+      font-size: 13px;
+      color: rgba(26,26,26,.5);
+      font-style: italic;
+      margin-top: 2px;
+    }
+    .str-back {
+      position: absolute;
+      inset: 0;
+      background: var(--ink);
+      color: var(--bg);
+      padding: 20px 22px;
+      display: flex;
+      align-items: flex-start;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity .25s, transform .25s;
+      overflow-y: auto;
+    }
+    .str-card:hover .str-back,
+    .str-card:focus .str-back {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .str-back ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .str-back ul li {
+      font-family: var(--sans);
+      font-size: 12.5px;
+      line-height: 1.65;
+      padding-left: 14px;
+      position: relative;
+      color: rgba(245,242,238,.85);
+    }
+    .str-back ul li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-size: 11px;
+      top: 2px;
+    }
+
+    /* ---- Campus ---- */
+    .campus-section-label {
+      font-family: var(--sans);
+      font-size: 11px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 14px;
+    }
+    .campus-tl-card {
+      margin-bottom: 8px;
+    }
+    .campus-org-card {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0;
+      border: 1px solid rgba(26,26,26,.1);
+      border-radius: 16px;
+      overflow: hidden;
+      background: var(--bg);
+      box-shadow: 0 4px 20px rgba(0,0,0,.06);
+    }
+    .campus-org-img {
+      aspect-ratio: 4/3;
+      overflow: hidden;
+    }
+    .campus-org-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform .5s ease;
+    }
+    .campus-org-card:hover .campus-org-img img { transform: scale(1.04); }
+    .campus-org-body {
+      padding: 28px 28px 28px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .campus-org-title {
+      font-family: var(--serif);
+      font-size: clamp(17px, 1.8vw, 22px);
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 18px;
+    }
+    .campus-org-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .campus-org-list li {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      padding-left: 14px;
+      border-left: 2px solid var(--accent);
+    }
+    .campus-org-role {
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink);
+    }
+    .campus-org-desc {
+      font-family: var(--sans);
+      font-size: 12px;
+      line-height: 1.6;
+      color: rgba(26,26,26,.62);
+    }
+    @media (max-width: 700px) {
+      .campus-org-card { grid-template-columns: 1fr; }
+      .campus-org-img { aspect-ratio: 16/9; }
+    }
+
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 500;
+      background: var(--bg);
+      overflow-y: auto;
+      transform: translateX(100%);
+      transition: transform .5s cubic-bezier(.77,0,.175,1);
+    }
+    .overlay.open { transform: translateX(0); }
+    .overlay-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 80px 48px 120px;
+    }
+    .overlay-close {
+      position: fixed;
+      top: 28px; left: 36px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: none;
+      font-family: var(--sans);
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--ink);
+      background: rgba(245,242,238,0.82);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1.5px solid rgba(26,26,26,.14);
+      border-radius: 100px;
+      padding: 10px 20px 10px 14px;
+      z-index: 600;
+      transition: background .2s, transform .2s, border-color .2s;
+    }
+    .overlay-close::before {
+      content: '←';
+      font-size: 16px;
+      line-height: 1;
+      transition: transform .2s;
+    }
+    .overlay-close:hover {
+      background: var(--ink);
+      color: var(--bg);
+      border-color: var(--ink);
+      transform: translateX(-3px);
+    }
+    .overlay-close:hover::before { transform: translateX(-2px); }
+
+    .overlay-eyebrow {
+      font-size: 11px;
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 24px;
+    }
+    .overlay-title {
+      font-family: var(--serif);
+      font-size: clamp(40px, 6vw, 72px);
+      line-height: 1;
+      letter-spacing: -.02em;
+      margin-bottom: 48px;
+    }
+    .overlay-divider {
+      width: 60px; height: 2px;
+      background: var(--accent);
+      margin-bottom: 40px;
+    }
+
+    /* 详情内文排版 */
+    .detail-section { margin-bottom: 56px; }
+    .detail-section h3 {
+      font-size: 13px;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+    .detail-section p, .detail-section li {
+      font-size: 16px;
+      line-height: 1.8;
+      color: #444;
+    }
+    .detail-section ul { padding-left: 20px; }
+    .detail-section ul li { margin-bottom: 10px; }
+
+    .exp-card {
+      border: 1px solid rgba(0,0,0,.1);
+      border-radius: 4px;
+      padding: 28px 32px;
+      margin-bottom: 20px;
+      transition: box-shadow .2s;
+    }
+    .exp-card:hover { box-shadow: 0 8px 32px rgba(0,0,0,.08); }
+    .exp-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .exp-company {
+      font-family: var(--serif);
+      font-size: 22px;
+      color: var(--ink);
+    }
+    .exp-period {
+      font-size: 12px;
+      letter-spacing: .08em;
+      color: var(--muted);
+    }
+    .exp-role {
+      font-size: 13px;
+      color: var(--accent);
+      letter-spacing: .06em;
+      margin-bottom: 16px;
+    }
+    .metric-row {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+    .metric {
+      background: var(--ink);
+      color: var(--bg);
+      padding: 6px 16px;
+      font-size: 13px;
+      letter-spacing: .04em;
+      border-radius: 2px;
+    }
+    .metric span { color: var(--accent); font-family: var(--serif); font-size: 16px; }
+
+    .skill-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    .skill-item {
+      padding: 20px;
+      background: rgba(0,0,0,.03);
+      border-radius: 4px;
+    }
+    .skill-item .skill-cat {
+      font-size: 11px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 8px;
+    }
+    .skill-item .skill-list {
+      font-size: 14px;
+      color: #555;
+      line-height: 1.7;
+    }
+
+    .edu-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+      padding: 24px 0;
+      border-bottom: 1px solid rgba(0,0,0,.07);
+    }
+    .edu-school { font-family: var(--serif); font-size: 20px; margin-bottom: 6px; }
+    .edu-degree { color: var(--muted); font-size: 14px; }
+    .edu-period { color: var(--accent); font-size: 13px; white-space: nowrap; }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--ink);
+      color: var(--bg);
+      padding: 60px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    footer .footer-name {
+      font-family: var(--serif);
+      font-size: 28px;
+      letter-spacing: -.01em;
+    }
+    footer .footer-links {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+    }
+    footer .footer-links a {
+      color: rgba(255,255,255,.5);
+      font-size: 13px;
+      text-decoration: none;
+      letter-spacing: .08em;
+      transition: color .2s;
+    }
+    footer .footer-links a:hover { color: var(--accent); }
+
+    /* ── 响应式 ── */
+    @media (max-width: 900px) {
+      nav { padding: 16px 24px; }
+      section, #modules, footer { padding-left: 24px; padding-right: 24px; }
+      #hero { padding: 0 24px 60px; }
+      .grid { grid-template-columns: repeat(2, 1fr); }
+      .overlay-inner { padding: 60px 24px 80px; }
+    }
+
+    /* ── 进入动画 ── */
+    .fade-in {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity .7s ease, transform .7s ease;
+    }
+    .fade-in.visible {
+      opacity: 1;
+      transform: none;
+    }
+  </style>
+</head>
+<body>
+
+<!-- 光标 -->
+<div id="cursor"></div>
+<div id="cursor-follower"></div>
+<div id="tooltip"></div>
+
+<!-- 导航 -->
+<nav>
+  <a class="nav-logo" href="#">李子翎 LZL</a>
+  <ul class="nav-links">
+    <li><a href="#modules">Work</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- Hero -->
+<section id="hero">
+  <div class="hero-bg-text">PM</div>
+  <div class="hero-eyebrow">Product Manager · 2027届硕士 · 北京交通大学</div>
+  <h1 class="hero-name">李<em>子翎</em><br>Lilian</h1>
+  <p class="hero-sub">
+    专注于商业化与用户增长产品，热爱用数据驱动决策。<br>
+    三段头部互联网实习，始终以用户为先。
+  </p>
+  <div class="hero-tags">
+    <span class="tag">商业化广告</span>
+    <span class="tag">用户增长</span>
+    <span class="tag">数据分析</span>
+    <span class="tag">竞价策略</span>
+    <span class="tag">交互设计</span>
+    <span class="tag">项目统筹</span>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    Scroll to explore
+  </div>
+</section>
+
+<!-- 模块网格 -->
+<section id="modules">
+  <h2 class="modules-title">Select a <em>module</em><br>to explore</h2>
+  <div class="grid">
+    <div class="module-card fade-in" data-overlay="edu" data-label="教育经历">
+      <span class="card-num">01</span>
+      <div class="card-icon"><img src="https://dwz.cn/agmES3TQ" alt="教育经历"></div>
+    </div>
+    <div class="module-card fade-in" data-overlay="exp" data-label="项目经历">
+      <span class="card-num">02</span>
+      <div class="card-icon"><img src="https://dwz.cn/k9x0phiV" alt="项目经历"></div>
+    </div>
+    <div class="module-card fade-in" data-overlay="skills" data-label="技能装备">
+      <span class="card-num">03</span>
+      <div class="card-icon"><img src="https://dwz.cn/Hx9VDj49" alt="技能装备"></div>
+    </div>
+    <div class="module-card fade-in" data-overlay="campus" data-label="校园故事">
+      <span class="card-num">04</span>
+      <div class="card-icon"><img src="https://dwz.cn/owtnnb9a" alt="校园故事"></div>
+    </div>
+    <div class="module-card fade-in" data-overlay="life" data-label="生活侧面">
+      <span class="card-num">05</span>
+      <div class="card-icon"><img src="https://dwz.cn/2hgZF0PJ" alt="生活侧面"></div>
+    </div>
+    <div class="module-card fade-in" data-overlay="strengths" data-label="个人优势">
+      <span class="card-num">06</span>
+      <div class="card-icon"><img src="https://dwz.cn/eAdNk6GR" alt="个人优势"></div>
+    </div>
+    <div class="module-card fade-in" data-overlay="portfolio" data-label="作品集">
+      <span class="card-num">07</span>
+      <div class="card-icon"><img src="https://dwz.cn/2oqN9AOO" alt="作品集"></div>
+    </div>
+    <div class="module-card fade-in" data-overlay="contact" data-label="联系我">
+      <span class="card-num">08</span>
+      <div class="card-icon"><img src="https://dwz.cn/vkL0zjXp" alt="联系我"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer id="contact">
+  <div class="footer-name">李子翎 · Lilian</div>
+  <ul class="footer-links">
+    <li><a href="mailto:3315586668@qq.com">Email</a></li>
+    <li><a href="https://my.feishu.cn/wiki/HK8Awce1ciMMmBk9h14ckOFvnzd" target="_blank">作品集飞书</a></li>
+    <li><a href="tel:18111908302">Phone</a></li>
+  </ul>
+</footer>
+
+<!-- ══════════════════════ OVERLAYS ══════════════════════ -->
+
+<!-- 01 项目经历 -->
+<div class="overlay" id="ov-exp">
+  <button class="overlay-close" data-close="exp">Back</button>
+  <div class="overlay-inner exp-overlay-inner">
+    <div class="overlay-eyebrow">02 · Projects</div>
+    <h2 class="overlay-title">项目<br>经历</h2>
+    <div class="overlay-divider"></div>
+
+    <!-- 时间轴布局 -->
+    <div class="timeline-wrap">
+      <!-- 左侧：时间节点列 -->
+      <div class="tl-track">
+        <div class="tl-fill" id="tlFill"></div>
+        <div class="tl-node" data-card="0">
+          <div class="tl-time-label">百度<br>2026.05–08</div>
+          <div class="tl-dot"></div>
+        </div>
+        <div class="tl-node" data-card="1">
+          <div class="tl-time-label">百度<br>2026.05–08</div>
+          <div class="tl-dot"></div>
+        </div>
+        <div class="tl-node" data-card="2">
+          <div class="tl-time-label">美团<br>2025.10–<br>2026.01</div>
+          <div class="tl-dot"></div>
+        </div>
+        <div class="tl-node" data-card="3">
+          <div class="tl-time-label">京东<br>2025.08–10</div>
+          <div class="tl-dot"></div>
+        </div>
+      </div>
+
+      <!-- 项目卡片列 -->
+      <div class="tl-cards">
+
+        <!-- 百度 · 网盘云冲印重构 -->
+        <div class="tl-card" tabindex="0">
+          <div class="tl-card-collapsed">
+            <div class="tl-card-header">
+              <span class="tl-company baidu">● 百度 BAIDU · 用户增长</span>
+              <span class="tl-period">2026.05–08</span>
+            </div>
+            <div class="tl-card-name">网盘云冲印<br>重构项目</div>
+            <div class="tl-metrics">
+              <span class="tl-metric-big">DAU<em>+20,000</em></span>
+              <span class="tl-metric-big">收入<em>+11,000</em><small>/天</small></span>
+            </div>
+            <div class="tl-tags">
+              <span class="tl-tag">商业化</span>
+              <span class="tl-tag">用户增长</span>
+              <span class="tl-tag">跨部门协作</span>
+            </div>
+          </div>
+          <div class="tl-card-detail">
+            <ul>
+              <li>从商品、页面、支付、数据等方面整体升级冲印服务，统筹 10 余方协同，100+人天历时 2 个月按期上线。</li>
+              <li>ToC 打通用户触达→商品选择→编辑→支付→转化全链路，ToB 完善商业后台供给能力。</li>
+              <li>设计收入归因参数及经营报表，打通关键漏斗数据，使用 AI 工具搭建多维业务看板。</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 百度 · 梯度激励广告 -->
+        <div class="tl-card" tabindex="0">
+          <div class="tl-card-collapsed">
+            <div class="tl-card-header">
+              <span class="tl-company baidu">● 百度 BAIDU · 商业化</span>
+              <span class="tl-period">2026.05–08</span>
+            </div>
+            <div class="tl-card-name">梯度激励<br>广告优化</div>
+            <div class="tl-metrics">
+              <span class="tl-metric-big">广告收入<em>+18,000</em><small>/天</small></span>
+              <span class="tl-metric-big">eCPM<em>+2%</em></span>
+            </div>
+            <div class="tl-tags">
+              <span class="tl-tag">商业化广告</span>
+              <span class="tl-tag">AB Test</span>
+              <span class="tl-tag">eCPM 优化</span>
+            </div>
+          </div>
+          <div class="tl-card-detail">
+            <ul>
+              <li>搭建按周累计、分节点解锁的梯度奖励机制，提升激励广告曝光量与场景渗透率。</li>
+              <li>基于用户激励与体系稳定性双重目标，拆分梯度奖励与日常奖励频次，确保额外权益独立发放。</li>
+              <li>梳理奖励优先级与发放状态矩阵，形成任务引导与奖励闭环。</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 美团 · 订单通 -->
+        <div class="tl-card" tabindex="0">
+          <div class="tl-card-collapsed">
+            <div class="tl-card-header">
+              <span class="tl-company meituan">● 美团 MEITUAN · 商业化</span>
+              <span class="tl-period">2025.10–2026.01</span>
+            </div>
+            <div class="tl-card-name">订单通<br>CPS 广告产品</div>
+            <div class="tl-metrics">
+              <span class="tl-metric-big">收入<em>+26,000</em><small>/天</small></span>
+              <span class="tl-metric-big">订单数<em>+59.71%</em></span>
+            </div>
+            <div class="tl-tags">
+              <span class="tl-tag">0→1</span>
+              <span class="tl-tag">CPS 广告</span>
+              <span class="tl-tag">CVR 优化</span>
+            </div>
+          </div>
+          <div class="tl-card-detail">
+            <ul>
+              <li>负责 CPS 计费模式广告产品「订单通」从 0 到 1 搭建，推动低线城市商户广告覆盖增长。</li>
+              <li>制定出价策略：「一笔费率」降低商户决策门槛；设置浮动费率与费率减免的新品扶持策略。</li>
+              <li>设计 CPC 与 CPS 混合竞价策略；搭建完整 B 端功能，CVR 提升至 25.65%。</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 京东 · 外卖引流 -->
+        <div class="tl-card" tabindex="0">
+          <div class="tl-card-collapsed">
+            <div class="tl-card-header">
+              <span class="tl-company jd">● 京东 JD.COM · 用户增长</span>
+              <span class="tl-period">2025.08–10</span>
+            </div>
+            <div class="tl-card-name">外卖引流<br>增长活动</div>
+            <div class="tl-metrics">
+              <span class="tl-metric-big">ROI<em>11.1</em></span>
+              <span class="tl-metric-big">价值增量<em>+425%</em></span>
+            </div>
+            <div class="tl-tags">
+              <span class="tl-tag">用户增长</span>
+              <span class="tl-tag">引流活动</span>
+              <span class="tl-tag">ROI 优化</span>
+            </div>
+          </div>
+          <div class="tl-card-detail">
+            <ul>
+              <li>借外卖支付抽奖页在双十一期间引流至试用频道，提升用户价值与站内迁移效率。</li>
+              <li>设计动态用户圈选机制；将命中机制与抽奖转盘解耦，扩大活动覆盖范围。</li>
+              <li>按「外卖支付→试用落地页→频道首页→商详页」链路优化入口，强化免费心理，带来 425% 价值增量。</li>
+            </ul>
+          </div>
+        </div>
+
+      </div><!-- /tl-cards -->
+    </div><!-- /timeline-wrap -->
+  </div>
+</div>
+
+<!-- 06 个人优势 -->
+<div class="overlay" id="ov-strengths">
+  <button class="overlay-close" data-close="strengths">Back</button>
+  <div class="overlay-inner">
+    <div class="overlay-eyebrow">06 · Core Strengths</div>
+    <h2 class="overlay-title">个人<br>优势</h2>
+    <div class="overlay-divider"></div>
+    <div class="strengths-grid">
+
+      <div class="str-card" tabindex="0">
+        <div class="str-front">
+          <div class="str-num">01</div>
+          <div class="str-title">产品思维</div>
+          <div class="str-tagline">数据说话，用户买单</div>
+        </div>
+        <div class="str-back">
+          <ul>
+            <li>从用户行为链路出发设计产品方案，重视漏斗数据打通与归因分析，擅长 AB 测试驱动决策。</li>
+            <li>商业化产品经验覆盖 ToC 转化链路 + ToB 后台双侧建设，熟悉竞价排序、CPS/CPC 混合策略等广告核心机制。</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="str-card" tabindex="0">
+        <div class="str-front">
+          <div class="str-num">02</div>
+          <div class="str-title">AI 应用</div>
+          <div class="str-tagline">没有工具，就造工具</div>
+        </div>
+        <div class="str-back">
+          <ul>
+            <li>熟练使用 Claude、GPT 等 AI 工具提升工作效率，将 AI 融入日常产品设计与分析流程。</li>
+            <li>独立搭建 AI 自动化分析看板，实现数据采集→分析→播报→迭代全链路自动化。</li>
+            <li>持续关注前沿大模型产品与 Agent 动态，具备将 AI 能力转化为业务价值的落地意识。</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="str-card" tabindex="0">
+        <div class="str-front">
+          <div class="str-num">03</div>
+          <div class="str-title">学习能力</div>
+          <div class="str-tagline">没有不会的事，只有不学的人</div>
+        </div>
+        <div class="str-back">
+          <ul>
+            <li>一周自学掌握 SQL、R 语言等应用；一周实现自动化分析、渲染、播报、自我迭代全流程。</li>
+            <li>实习期间主动学习广告竞价机制、数据归因等陌生领域知识，快速上手并独立输出分析方案。</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="str-card" tabindex="0">
+        <div class="str-front">
+          <div class="str-num">04</div>
+          <div class="str-title">协作统筹</div>
+          <div class="str-tagline">让十个人走向同一个目标</div>
+        </div>
+        <div class="str-back">
+          <ul>
+            <li>百度云冲印项目统筹 10 余方协同，覆盖需求、排期、联调与验收，保障 100+人天项目按期交付。</li>
+            <li>担任团委办公室实践部部长，统筹 15 个学生社团常务工作，具备跨团队沟通协调能力。</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="str-card" tabindex="0">
+        <div class="str-front">
+          <div class="str-num">05</div>
+          <div class="str-title">数据分析</div>
+          <div class="str-tagline">让数字开口说话</div>
+        </div>
+        <div class="str-back">
+          <ul>
+            <li>熟练使用 SQL、Python、R、Stata 进行数据分析，掌握词云、回归、聚类等分析方法。</li>
+            <li>能使用 PowerBI、Tableau 搭建可视化看板，支持业务运营决策。</li>
+          </ul>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- 03 技能装备 -->
+<div class="overlay" id="ov-skills">
+  <button class="overlay-close" data-close="skills">Back</button>
+  <div class="overlay-inner">
+    <div class="overlay-eyebrow">03 · Skills & Tools</div>
+    <h2 class="overlay-title">技能<br>装备</h2>
+    <div class="overlay-divider"></div>
+    <div class="skill-grid">
+      <div class="skill-item">
+        <div class="skill-cat">AI 工具</div>
+        <div class="skill-list">Claude · GPT<br>多模型综合应用</div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-cat">产品设计</div>
+        <div class="skill-list">Axure · Figma</div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-cat">数据分析</div>
+        <div class="skill-list">SQL · Stata · R<br>Python（词云/回归/聚类）</div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-cat">可视化</div>
+        <div class="skill-list">PowerBI · Tableau</div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-cat">金融数据库</div>
+        <div class="skill-list">同花顺 iFind<br>国泰安 CSMAR</div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-cat">办公工具</div>
+        <div class="skill-list">Office 全套<br>飞书 · 语雀</div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-cat">语言证书</div>
+        <div class="skill-list">CET-6<br>普通话一级乙等</div>
+      </div>
+      <div class="skill-item">
+        <div class="skill-cat">自学能力</div>
+        <div class="skill-list">一周自学 SQL、R 应用<br>AI 自动化分析搭建</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 04 教育经历 -->
+<div class="overlay" id="ov-edu">
+  <button class="overlay-close" data-close="edu">Back</button>
+  <div class="overlay-inner edu-overlay-inner">
+    <div class="overlay-eyebrow">01 · Education</div>
+    <h2 class="overlay-title">我的学习<br>坐标</h2>
+    <div class="overlay-divider"></div>
+
+    <div class="edu-grid">
+      <!-- 硕士 -->
+      <div class="edu-card">
+        <img class="edu-card-img"
+             src="https://dwz.cn/NrWkYf4W"
+             alt="北京交通大学校园" />
+        <div class="edu-card-body">
+          <div class="edu-card-period">2025.09 — 2027.06</div>
+          <div class="edu-card-meta">硕士 / 会计学（保送直研）</div>
+          <div class="edu-card-school">北京交通大学</div>
+          <div class="edu-card-badges">
+            <span class="edu-badge edu-badge-highlight">保送直研</span>
+            <span class="edu-badge edu-badge-normal">MPACC 案例大赛 二等奖</span>
+            <span class="edu-badge edu-badge-normal">证券模拟大赛 二等奖</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 本科 -->
+      <div class="edu-card">
+        <img class="edu-card-img"
+             src="https://dwz.cn/u7JcxIxL"
+             alt="北京交通大学校徽" />
+        <div class="edu-card-body">
+          <div class="edu-card-period">2021.09 — 2025.06</div>
+          <div class="edu-card-meta">本科 / 会计学</div>
+          <div class="edu-card-school">北京交通大学</div>
+          <div class="edu-card-badges">
+            <span class="edu-badge edu-badge-highlight">学习优秀奖学金 ×3</span>
+            <span class="edu-badge edu-badge-normal">专业排名前 20%</span>
+            <span class="edu-badge edu-badge-normal">市场调查大赛 国家三等奖</span>
+            <span class="edu-badge edu-badge-normal">团委实践部部长</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 05 校园故事 -->
+<div class="overlay" id="ov-campus">
+  <button class="overlay-close" data-close="campus">Back</button>
+  <div class="overlay-inner">
+    <div class="overlay-eyebrow">05 · Campus Life</div>
+    <h2 class="overlay-title">校园<br>故事</h2>
+    <div class="overlay-divider"></div>
+
+    <!-- 组织管理：图文卡片 -->
+    <div class="campus-section-label">组织管理</div>
+    <div class="campus-org-card">
+      <div class="campus-org-img">
+        <img src="https://dwz.cn/L4j15bUr" alt="组织管理">
+      </div>
+      <div class="campus-org-body">
+        <div class="campus-org-title">学生干部 · 组织管理</div>
+        <ul class="campus-org-list">
+          <li>
+            <span class="campus-org-role">团委办公室实践部 部长</span>
+            <span class="campus-org-desc">统筹 15 个学生社团常务工作，举办大小活动 10 余场，负责对外联络与资源协调。</span>
+          </li>
+          <li>
+            <span class="campus-org-role">研究生科助管 · 新生班主任助理</span>
+            <span class="campus-org-desc">主导团队运营官方公众号，策划内容选题，提升学院新媒体影响力。</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 全国大学生市场调查大赛：tl-card 逻辑 -->
+    <div class="campus-section-label" style="margin-top:36px">比赛经历</div>
+    <div class="campus-tl-card tl-card" tabindex="0">
+      <div class="tl-card-collapsed">
+        <div class="tl-card-header">
+          <span class="tl-company baidu">● 全国大学生市场调查与分析大赛</span>
+          <span class="tl-period">2023</span>
+        </div>
+        <div class="tl-card-name">绿色旅游参与<br>意愿调研报告</div>
+        <div class="tl-metrics">
+          <span class="tl-metric-big">国家级<em>三等奖</em></span>
+          <span class="tl-metric-big">省级<em>一等奖</em></span>
+        </div>
+        <div class="tl-tags">
+          <span class="tl-tag">市场调研</span>
+          <span class="tl-tag">Python / R</span>
+          <span class="tl-tag">数据分析</span>
+        </div>
+      </div>
+      <div class="tl-card-detail">
+        <ul>
+          <li>调研北京市居民绿色旅游参与意愿，设计发放 400+ 问卷，线下 1v1 访谈 30+ 人。</li>
+          <li>运用 Python、R 语言进行词云分析、回归与聚类分析，撰写完整研究报告。</li>
+          <li>从宏观政策、用户偏好等维度总结绿色旅游现状与痛点，提出参与机制建议。</li>
+          <li>成果：校级一等奖 → 省级一等奖 → 国家级三等奖。</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 06 作品集 -->
+<div class="overlay" id="ov-portfolio">
+  <button class="overlay-close" data-close="portfolio">Back</button>
+  <div class="overlay-inner">
+    <div class="overlay-eyebrow">06 · Portfolio</div>
+    <h2 class="overlay-title">作品<br>集</h2>
+    <div class="overlay-divider"></div>
+    <div class="detail-section">
+      <p>我的项目 / AI 作品集完整收录于飞书 Wiki，包含需求文档、产品demo、数据分析报告、AI应用等。</p>
+      <p style="margin-top:24px">
+        <a href="https://my.feishu.cn/wiki/HK8Awce1ciMMmBk9h14ckOFvnzd?from=from_copylink"
+           target="_blank"
+           style="display:inline-block; padding:14px 32px; background:var(--ink); color:var(--bg);
+                  text-decoration:none; font-size:14px; letter-spacing:.08em; border-radius:2px;
+                  transition:background .2s;">
+          → 前往飞书作品集
+        </a>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- 07 生活侧面 -->
+<div class="overlay" id="ov-life">
+  <button class="overlay-close" data-close="life">Back</button>
+  <div class="overlay-inner">
+    <div class="overlay-eyebrow">07 · Life Beyond Work</div>
+    <h2 class="overlay-title">生活<br>侧面</h2>
+    <div class="overlay-divider"></div>
+    <div class="life-grid">
+      <div class="life-card lc-1 life-reveal">
+        <div class="life-card-img"><img src="https://dwz.cn/3t4LhRVY" alt="户外探险"></div>
+        <div class="life-card-body">
+          <span class="life-tag">户外探险者</span>
+          <p>徒步 · 滑翔伞 · 潜水 · 滑雪 —— 热爱用身体丈量世界，用脚步丈量远方。</p>
+        </div>
+      </div>
+      <div class="life-card lc-2 life-reveal">
+        <div class="life-card-img"><img src="https://dwz.cn/gX6vgWiD" alt="电竞玩家"></div>
+        <div class="life-card-body">
+          <span class="life-tag">电竞玩家</span>
+          <p>电竞爱好者，曾获市级荣誉。竞争意识与策略思维同样是产品人的必修课。</p>
+        </div>
+      </div>
+      <div class="life-card lc-3 life-reveal">
+        <div class="life-card-img"><img src="https://dwz.cn/6roHC6YU" alt="热场歌手"></div>
+        <div class="life-card-body">
+          <span class="life-tag">热场歌手</span>
+          <p>KTV 热场选手，参与多个校园歌唱比赛。能量满格，永远热爱生活。</p>
+        </div>
+      </div>
+      <div class="life-card lc-4 life-reveal">
+        <div class="life-card-img"><img src="https://dwz.cn/jR1YK7gX" alt="健身自律"></div>
+        <div class="life-card-body">
+          <span class="life-tag">健身自律</span>
+          <p>每周固定健身，力量训练与有氧交替。身体的自律会迁移到工作——执行力都是练出来的。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 08 联系我 -->
+<div class="overlay" id="ov-contact">
+  <button class="overlay-close" data-close="contact">Back</button>
+  <div class="overlay-inner">
+    <div class="overlay-eyebrow">08 · Get in Touch</div>
+    <h2 class="overlay-title contact-title">联系我</h2>
+    <div class="overlay-divider"></div>
+
+    <p class="contact-story-line">下一个故事或许可以共同谱写……</p>
+
+    <p class="contact-intro">最快的联系方式是邮件或微信：</p>
+    <div class="contact-group">
+      <a class="contact-row" href="mailto:3315586668@qq.com">
+        <span class="contact-icon">✉</span>
+        <span class="contact-label">邮箱</span>
+        <span class="contact-value">3315586668@qq.com</span>
+        <span class="contact-arrow">↗</span>
+      </a>
+      <div class="contact-row no-link">
+        <span class="contact-icon">💬</span>
+        <span class="contact-label">微信</span>
+        <span class="contact-value">Lilian8302</span>
+      </div>
+      <div class="contact-row no-link">
+        <span class="contact-icon">📱</span>
+        <span class="contact-label">电话</span>
+        <span class="contact-value">181 1190 8302</span>
+      </div>
+    </div>
+
+    <p class="contact-intro" style="margin-top:40px">其他平台：</p>
+    <div class="contact-group">
+      <a class="contact-row" href="https://my.feishu.cn/wiki/HK8Awce1ciMMmBk9h14ckOFvnzd" target="_blank">
+        <span class="contact-icon">📄</span>
+        <span class="contact-label">作品集</span>
+        <span class="contact-value">飞书 Wiki</span>
+        <span class="contact-arrow">↗</span>
+      </a>
+    </div>
+
+    <p class="contact-closing">期待连接有趣的团队，一起做有价值的产品。</p>
+  </div>
+</div>
+
+<script>
+  /* ── 光标 ── */
+  const cursor = document.getElementById('cursor');
+  const follower = document.getElementById('cursor-follower');
+  const tooltip = document.getElementById('tooltip');
+  let fx = 0, fy = 0, mx = 0, my = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+    tooltip.style.left = mx + 'px';
+    tooltip.style.top = my + 'px';
+  });
+
+  function animFollower() {
+    fx += (mx - fx) * 0.18;
+    fy += (my - fy) * 0.18;
+    requestAnimationFrame(animFollower);
+  }
+  animFollower();
+
+  /* ── Hover 效果：卡片标签跟随鼠标 ── */
+  document.querySelectorAll('.module-card').forEach(card => {
+    card.addEventListener('mouseenter', () => {
+      cursor.classList.add('hovered');
+      tooltip.textContent = card.dataset.label || '';
+      tooltip.classList.add('show');
+    });
+    card.addEventListener('mouseleave', () => {
+      cursor.classList.remove('hovered');
+      tooltip.classList.remove('show');
+    });
+  });
+
+  document.querySelectorAll('a, button, .tag').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+  });
+
+  /* ── Overlay 打开 ── */
+  document.querySelectorAll('.module-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const id = card.dataset.overlay;
+      document.getElementById('ov-' + id)?.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    });
+  });
+
+  /* ── Overlay 关闭 ── */
+  document.querySelectorAll('.overlay-close').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.closest('.overlay').classList.remove('open');
+      document.body.style.overflow = '';
+    });
+  });
+
+  /* 点击覆盖层背景（边缘）关闭 */
+  document.querySelectorAll('.overlay').forEach(ov => {
+    ov.addEventListener('click', e => {
+      if (e.target === ov) {
+        ov.classList.remove('open');
+        document.body.style.overflow = '';
+      }
+    });
+  });
+  /* ESC 键关闭 */
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.overlay.open').forEach(ov => {
+        ov.classList.remove('open');
+        document.body.style.overflow = '';
+      });
+    }
+  });
+
+  /* ── 时间轴滚动填充 ── */
+  function initTimeline() {
+    const ovExp = document.getElementById('ov-exp');
+    const fill = document.getElementById('tlFill');
+    const dots = document.querySelectorAll('#ov-exp .tl-dot');
+    const cards = document.querySelectorAll('#ov-exp .tl-card');
+    if (!ovExp || !fill) return;
+
+    // 颜色映射
+    const colorMap = { baidu: '#2563eb', meituan: '#d97706', jd: '#d4522a' };
+    cards.forEach(card => {
+      const co = card.querySelector('.tl-company');
+      if (!co) return;
+      const cls = ['baidu','meituan','jd'].find(c => co.classList.contains(c));
+      const color = cls ? colorMap[cls] : '#d4522a';
+      card.querySelectorAll('.tl-metric-big em').forEach(em => em.style.color = color);
+    });
+
+    // 初始第一个圆点激活
+    if (dots[0]) dots[0].classList.add('active');
+
+    let ticking = false;
+    ovExp.addEventListener('scroll', () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        const scrollTop = ovExp.scrollTop;
+        const scrollHeight = ovExp.scrollHeight - ovExp.clientHeight;
+        const pct = scrollHeight > 0 ? Math.min(scrollTop / scrollHeight * 100, 100) : 0;
+
+        // 时间轴填充高度：从第一个圆点到最后一个圆点之间
+        const trackEl = ovExp.querySelector('.tl-track');
+        if (trackEl) {
+          const trackH = trackEl.getBoundingClientRect().height - 32;
+          fill.style.height = Math.min(pct / 100 * trackH + 0, trackH) + 'px';
+        }
+
+        // 激活圆点：按卡片位置判断
+        dots.forEach((dot, i) => {
+          const threshold = i * (100 / dots.length);
+          dot.classList.toggle('active', pct >= threshold);
+        });
+        ticking = false;
+      });
+    });
+  }
+
+  // overlay 打开时初始化时间轴
+  document.querySelectorAll('.module-card').forEach(card => {
+    card.addEventListener('click', () => {
+      if (card.dataset.overlay === 'exp') {
+        setTimeout(() => {
+          initTimeline();
+          alignTimelineNodes();
+        }, 120);
+      }
+    });
+  });
+
+  // 将左侧 tl-node 与右侧卡片顶部对齐
+  function alignTimelineNodes() {
+    const cards = document.querySelectorAll('#ov-exp .tl-card');
+    const nodes = document.querySelectorAll('#ov-exp .tl-node');
+    const cardsWrap = document.querySelector('#ov-exp .tl-cards');
+    const trackWrap = document.querySelector('#ov-exp .tl-track');
+    if (!cards.length || !nodes.length || !cardsWrap || !trackWrap) return;
+
+    const wrapTop = cardsWrap.getBoundingClientRect().top;
+    const trackTop = trackWrap.getBoundingClientRect().top;
+
+    // 先重置
+    nodes.forEach(n => { n.style.marginTop = '0'; n.style.paddingTop = '0'; });
+
+    cards.forEach((card, i) => {
+      if (!nodes[i]) return;
+      const cardTop = card.getBoundingClientRect().top;
+      const nodeTop = nodes[i].getBoundingClientRect().top;
+      const diff = cardTop - nodeTop;
+      if (i === 0) {
+        nodes[i].style.paddingTop = Math.max(0, diff) + 'px';
+      } else {
+        const prevCardBottom = cards[i-1].getBoundingClientRect().bottom;
+        const prevNodeBottom = nodes[i-1].getBoundingClientRect().bottom;
+        const gap = (cardTop - prevCardBottom) + (prevCardBottom - prevNodeBottom);
+        nodes[i].style.marginTop = Math.max(12, gap) + 'px';
+      }
+    });
+  }
+
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('.fade-in').forEach((el, i) => {
+    el.style.transitionDelay = (i * 0.08) + 's';
+    observer.observe(el);
+  });
+
+  // life overlay scroll reveal
+  function initLifeReveal() {
+    const lifeOverlay = document.getElementById('ov-life');
+    const cards = lifeOverlay.querySelectorAll('.life-reveal');
+    if (!cards.length) return;
+
+    const lifeObserver = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          lifeObserver.unobserve(entry.target);
+        }
+      });
+    }, { root: lifeOverlay, threshold: 0.15 });
+
+    cards.forEach(c => lifeObserver.observe(c));
+  }
+
+  // trigger life reveal when life overlay opens
+  document.querySelectorAll('.module-card').forEach(card => {
+    card.addEventListener('click', () => {
+      if (card.dataset.overlay === 'life') {
+        setTimeout(initLifeReveal, 100);
+      }
+    });
+  });
+</script>
+</body>
+</html>
